@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Admin Panel</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #00FF00;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #00FF00;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            background-color: #2b2b2b;
+            color: #00FF00;
+            overflow-x: auto;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #333;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #444;
+        }
+
+        tr:hover {
+            background-color: #5c5c5c;
+            cursor: pointer;
+        }
+
+        .button {
+            background-color: #00FF00;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #1e1e1e;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background-color: #00cc00;
+        }
+
+        .button:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+        }
+
+        .loader {
+            border: 8px solid #2b2b2b;
+            border-top: 8px solid #00FF00;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .terminal {
+            background-color: #2b2b2b;
+            color: #00FF00;
+            padding: 15px;
+            margin-top: 50px;
+            border-radius: 5px;
+            width: 70%;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+        }
+
+        .terminal input {
+            background: transparent;
+            border: none;
+            color: #00FF00;
+            font-size: 18px;
+            width: 100%;
+            outline: none;
+        }
+
+        .terminal input:focus {
+            border-bottom: 2px solid #00FF00;
+        }
+
+        .hacker-select-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #2b2b2b;
+            border: 1px solid #00FF00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            width: 80%;
+        }
+
+        .select-group {
+            margin: 10px 0;
+        }
+
+        .select-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00FF00;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .hacker-select {
+            width: 100%;
+            padding: 8px;
+            background-color: #1e1e1e;
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+        }
+
+        .hacker-select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .hacker-select option {
+            background-color: #1e1e1e;
+            color: #00FF00;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            table {
+                width: 100%;
+            }
+
+            .hacker-select-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="add-user-to-second-server">Add User to Second Server</button>
+
+    <script>
+        document.getElementById("add-user-to-second-server").addEventListener("click", function() {
+            const userId = document.getElementById("user-select").value;
+            const serverId = document.getElementById("server-select").value;
+
+            if (!userId) {
+                alert("Please select a user to add to the second server.");
+                return;
+            }
+
+            fetch(`/add_user_to_second_server`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    server_id: serverId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("User has been added to the second server!");
+                } else {
+                    alert("Failed to add user: " + data.error);
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error);
+            });
+        });
+    </script>
+    
+<div class="container">
+    <h1>Admin Panel: Discord Bot</h1>
+
+    <div class="hacker-select-container">
+        <div class="select-group">
+            <label>Select User:</label>
+            <select id="user-select" class="hacker-select">
+                <option value="">Choose User...</option>
+            </select>
+        </div>
+        
+        <div class="select-group">
+            <label>Select Target Server:</label>
+            <select id="server-select" class="hacker-select">
+                <option value="">Choose Server...</option>
+            </select>
+        </div>
+        
+        <button class="button" onclick="moveUserToServer()">Execute Transfer</button>
+    </div>
+
+    <button class="button" onclick="refreshData()">Refresh Data</button>
+
+    <div class="loader" id="loader" style="display:none;"></div>
+
+    <h2>Members:</h2>
+    <table id="member-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>Roles:</h2>
+    <table id="role-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="terminal">
+        <input type="text" id="command-input" placeholder="Enter command...">
+    </div>
+</div>
+
+<script>
+    async function fetchMembers() {
+        try {
+            const response = await fetch("/members");
+            const members = await response.json();
+            const memberTableBody = document.getElementById("member-table").querySelector("tbody");
+
+            memberTableBody.innerHTML = "";
+
+            members.forEach(member => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${member.name}</td><td>${member.id}</td>`;
+                memberTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching members:", error);
+        }
+    }
+
+    async function fetchRoles() {
+        try {
+            const response = await fetch("/roles");
+            const roles = await response.json();
+            const roleTableBody = document.getElementById("role-table").querySelector("tbody");
+
+            roleTableBody.innerHTML = "";
+
+            roles.forEach(role => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${role.name}</td><td>${role.id}</td>`;
+                roleTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching roles:", error);
+        }
+    }
+
+    async function fetchServers() {
+        try {
+            const response = await fetch("/servers");
+            const servers = await response.json();
+            const serverSelect = document.getElementById("server-select");
+            
+            serverSelect.innerHTML = '<option value="">Choose Server...</option>';
+            
+            servers.forEach((server, index) => {
+                const option = document.createElement("option");
+                option.value = index;
+                option.textContent = `${index}: ${server.name}`;
+                serverSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching servers:", error);
+        }
+    }
+
+    async function populateUsers() {
+        const userSelect = document.getElementById("user-select");
+        userSelect.innerHTML = '<option value="">Choose User...</option>';
+        
+        const response = await fetch("/get_user_ids");
+        const userIds = await response.json();
+
+        userIds.forEach((userId, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = userId;
+            userSelect.appendChild(option);
+        });
+    }
+
+    async function moveUserToServer() {
+        const userIndex = document.getElementById("user-select").value;
+        const serverIndex = document.getElementById("server-select").value;
+
+        if (userIndex === "" || serverIndex === "") {
+            alert("Please select both a user and a server");
+            return;
+        }
+
+        console.log(`Moving user at index: ${userIndex} to server index: ${serverIndex}`);
+
+        try {
+            const response = await fetch('/add_user_to_second_server', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_index: userIndex,
+                    server_index: serverIndex
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                alert('Transfer successful: User moved to selected server');
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error);
+        }
+    }
+
+    async function refreshData() {
+        document.getElementById("loader").style.display = "block";
+        await fetchMembers();
+        await fetchRoles();
+        await fetchServers();
+        await populateUsers();
+        document.getElementById("loader").style.display = "none";
+    }
+
+    window.addEventListener("load", () => {
+        populateUsers();
+    });
+
+    document.getElementById("command-input").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            const command = e.target.value;
+            console.log(`Command entered: ${command}`);
+            e.target.value = '';
+        }
+    });
+</script>
+
+<button onclick="addToSecondServer()">Join Second Server</button>
+
+<script>
+function addToSecondServer() {
+    fetch('/add_user_to_second_server')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Successfully joined second server!');
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
+}
+</script>
+
+</body>
+</html>
